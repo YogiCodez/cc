@@ -927,7 +927,7 @@ cv2.destroyAllWindows()
 import cv2
 
 # Load the image
-image = cv2.imread(r"C:\Users\antoc\OneDrive\Desktop\Course CV\LAB\src\img3.jpg")  # Replace with your image path
+image = cv2.imread(r"C:\Users\\OneDrive\Desktop\Course CV\LAB\src\img3.jpg")  # Replace with your image path
 if image is None:
     print("Image not found!")
     exit()
