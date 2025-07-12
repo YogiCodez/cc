@@ -1,0 +1,130 @@
+GENERAL ML CONCEPTS
+1. What is the difference between supervised and unsupervised learning?
+→ Supervised learning uses labeled data; unsupervised uses unlabeled data.
+
+2. What is overfitting and underfitting?
+→ Overfitting: model learns too much, poor on new data.
+→ Underfitting: model is too simple, poor on both training & test data.
+
+3. What is the difference between classification and regression?
+→ Classification predicts categories (e.g., Yes/No); Regression predicts continuous values (e.g., Price).
+
+4. What is the role of training and testing data?
+→ Training is used to build the model; Testing is used to evaluate it.
+
+5. What is cross-validation?
+→ It's a method to test model performance using multiple train-test splits.
+
+6. What is a confusion matrix?
+→ A 2x2 table showing correct & incorrect classifications.
+
+🔹 FIND-S & CANDIDATE ELIMINATION
+7. What is Find-S algorithm?
+→ An algorithm to find the most specific hypothesis consistent with all positive examples.
+
+8. Why does Find-S only use positive examples?
+→ Because it assumes negative examples are unnecessary for generalization.
+
+9. What is a hypothesis in Find-S?
+→ A tuple representing conditions for positive output.
+
+10. What is Candidate Elimination algorithm?
+→ It finds all consistent hypotheses by maintaining both general (G) and specific (S) boundaries.
+
+11. What is version space?
+→ All hypotheses between the most specific and most general consistent with training data.
+
+🔹 ID3 DECISION TREE
+12. What is entropy?
+→ A measure of impurity or randomness in the dataset.
+
+13. What is information gain?
+→ Reduction in entropy after splitting data by an attribute.
+
+14. How does ID3 choose attributes?
+→ By selecting the one with highest information gain.
+
+15. Advantages of decision trees?
+→ Easy to interpret, fast, and works for both numeric & categorical data.
+
+🔹 NAIVE BAYES
+16. What is the main assumption in Naive Bayes?
+→ All features are independent of each other given the class.
+
+17. Bayes' Theorem Formula?
+→ P(H|E) = P(E|H) * P(H) / P(E)
+
+18. Where is Naive Bayes used?
+→ Text classification, spam detection, sentiment analysis.
+
+19. Can Naive Bayes handle numeric values?
+→ Yes, using Gaussian Naive Bayes.
+
+🔹 K-NEAREST NEIGHBORS
+20. What is KNN?
+→ A lazy learning algorithm that classifies based on majority of nearest neighbors.
+
+21. What does 'K' represent in KNN?
+→ Number of nearest neighbors considered for voting.
+
+22. How is distance measured in KNN?
+→ Usually using Euclidean distance.
+
+23. Is KNN parametric or non-parametric?
+→ Non-parametric (no fixed assumptions about data).
+
+🔹 REGRESSION
+24. Difference between Linear and Logistic Regression?
+→ Linear for continuous values; Logistic for binary classification.
+
+25. What is the sigmoid function?
+→ A function that maps output between 0 and 1.
+
+26. Cost function in Linear Regression?
+→ Mean Squared Error (MSE).
+
+27. How do you evaluate a regression model?
+→ Using RMSE, MAE, R² score.
+
+🔹 ANN / PERCEPTRON
+28. What is a perceptron?
+→ A single-layer neural unit for binary classification.
+
+29. What is forward and backpropagation?
+→ Forward: compute prediction; Backpropagation: update weights using error.
+
+30. What is an activation function?
+→ It introduces non-linearity (e.g., ReLU, Sigmoid).
+
+31. Difference between ANN and Logistic Regression?
+→ ANN has multiple neurons/layers; Logistic regression is a simple classifier.
+
+🔹 EM ALGORITHM (Expectation Maximization)
+32. What is EM Algorithm?
+→ It’s an iterative approach to estimate parameters for data with missing/hidden values.
+
+33. Where is EM used?
+→ Clustering, Gaussian Mixture Models, hidden variables.
+
+34. What are steps in EM?
+→ E-step: Estimate missing data.
+→ M-step: Maximize likelihood using estimates.
+
+35. Difference between EM and K-Means?
+→ K-Means assigns hard clusters, EM gives soft probability-based clusters.
+
+🔹 EVALUATION METRICS
+36. What is accuracy?
+→ (TP + TN) / Total samples.
+
+37. What are precision and recall?
+→ Precision = TP / (TP + FP), Recall = TP / (TP + FN)
+
+38. What is RMSE?
+→ Root Mean Squared Error – metric for regression.
+
+39. What is F1-score?
+→ Harmonic mean of precision and recall.
+
+40. What is R² score?
+→ It tells how well regression predictions fit actual data (1 = perfect).
