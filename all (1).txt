@@ -1,0 +1,699 @@
+1	Implement and demonstrate the FIND-S algorithm for finding the most specific hypothesis based on a given set of training data samples. 
+2	For a given set of training data examples stored in a .CSV file, implement and demonstrate the Candidate-Elimination algorithm in python to output a description of the set of all hypotheses consistent with the training examples
+3	Demonstrate the working of the decision tree based ID3 algorithm. Use an appropriate data set for building the decision tree and apply this knowledge to classify a new sample.
+4	Build an Artificial Neural Network by implementing the Backpropagation algorithm and test the same using appropriate data sets.
+5	Write a program for Implementation of K-Nearest Neighbours (K-NN) in Python
+6	Write a program to implement Naïve Bayes algorithm in python and to display the results  using confusion matrix and accuracy.
+7	Write a program to implement Logistic Regression (LR) algorithm in python
+8	Write a program to implement Linear Regression (LR) algorithm in python
+9	Compare  Linear and Polynomial Regression using Python
+10	Write a Python Program to Implement Expectation & Maximization Algorithm
+APPLICATIONS
+11	Write a program for the task of Credit Score Classification
+12	Implement Iris Flower Classification using KNN
+13	Implement the Car Price Prediction Model using Python
+14	Implement House price Prediction using appropriate machine learning algorithm
+15	Implement Iris Flower Classification using Naive Bayes classifier
+16	Compare different types Classification Algorithms and evaluate their performance.
+17	Implement Mobile Price Prediction using appropriate machine learning algorithm
+
+18	Implement Perceptron based IRIS classification
+19	Implementation of Naive Bayes classification for Bank Loan prediction
+20	Implement Future Sales Prediction using a suitable machine learning algorithm
+
+
+
+#1--------------------------------------------
+a = [['sky', 'airtemp', 'humidity', 'wind', 'water', 'forcast', 'enjoysport'],
+     ['sunny', 'warm', 'normal', 'strong', 'warm', 'same', 'yes'],
+     ['sunny', 'warm', 'high', 'strong', 'warm', 'same', 'yes'],
+     ['rainy', 'cold', 'high', 'strong', 'warm', 'change', 'no'],
+     ['sunny', 'warm', 'high', 'strong', 'cool', 'change', 'yes']]
+print("\n The total number of training instances are : ",len(a))
+num_attribute = len(a[0])-1
+print("\n The initial hypothesis is : ")
+hypothesis = ['0']*num_attribute
+print(hypothesis)
+for i in range(0, len(a)):
+ if a[i][num_attribute] == 'yes':
+  for j in range(0, num_attribute):
+      if hypothesis[j] == '0' or hypothesis[j] == a[i][j]:
+          hypothesis[j] = a[i][j]
+      else:
+          hypothesis[j] = '?'
+ print("\n The hypothesis for the training instance {} is :\n" .format(i+1),hypothesis)
+print("\n The Maximally specific hypothesis for the training instance is ")
+print(hypothesis)
+
+#2-------------------------------------------
+# Dataset: [Sky, Temp, Humidity, Wind, Water, Forecast, EnjoySport]
+data = [
+    ['Sunny', 'Warm', 'Normal', 'Strong', 'Warm', 'Same', 'yes'],
+    ['Sunny', 'Warm', 'High',   'Strong', 'Warm', 'Same', 'yes'],
+    ['Rainy', 'Cold', 'High',   'Strong', 'Warm', 'Change', 'no'],
+    ['Sunny', 'Warm', 'High',   'Strong', 'Cool', 'Change', 'yes']
+]
+
+def consistent(h, x):
+    return all(h[i] == x[i] or h[i] == '?' for i in range(len(h)))
+
+def candidate_elimination(data):
+    n_attr = len(data[0]) - 1
+    S = data[0][:-1]
+    G = [['?' for _ in range(n_attr)]]
+    domains = [set([x[i] for x in data]) for i in range(n_attr)]
+
+    for x in data:
+        attrs, label = x[:-1], x[-1]
+        if label == 'yes':
+            G = [g for g in G if consistent(g, attrs)]
+            for i in range(n_attr):
+                if S[i] != attrs[i]:
+                    S[i] = '?'
+        else:
+            G_new = []
+            for g in G:
+                if consistent(g, attrs):
+                    for i in range(n_attr):
+                        if g[i] == '?':
+                            for val in domains[i]:
+                                if val != attrs[i]:
+                                    h = g.copy()
+                                    h[i] = val
+                                    if consistent(S, h):
+                                        G_new.append(h)
+            G = G_new
+        print(f"\nInstance: {x}\nS: {S}\nG: {G}")
+
+    return S, G
+
+S_final, G_final = candidate_elimination(data)
+print("\nFinal Specific Hypothesis:", S_final)
+print("Final General Hypotheses:", G_final)
+
+
+3--------------------------------------------------------
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
+
+# Dataset: [Sky, Temp, Humidity, Wind, Water, Forecast]
+X = [
+    ['Sunny', 'Warm', 'Normal', 'Strong', 'Warm', 'Same'],
+    ['Sunny', 'Warm', 'High',   'Strong', 'Warm', 'Same'],
+    ['Rainy', 'Cold', 'High',   'Strong', 'Warm', 'Change'],
+    ['Sunny', 'Warm', 'High',   'Strong', 'Cool', 'Change']
+]
+y = ['Yes', 'Yes', 'No', 'Yes']
+
+# Label encode the features
+encoders = []
+X_encoded = []
+
+for col in zip(*X):  # Transpose to columns
+    le = LabelEncoder()
+    encoded_col = le.fit_transform(col)
+    encoders.append(le)
+    X_encoded.append(encoded_col)
+
+X_encoded = list(zip(*X_encoded))  # Transpose back to rows
+
+# Train the ID3 decision tree model (using entropy)
+model = DecisionTreeClassifier(criterion='entropy')
+model.fit(X_encoded, y)
+
+# New sample to classify
+sample = ['Sunny', 'Warm', 'High', 'Strong', 'Cool', 'Change']
+
+# Encode the new sample using the same encoders
+sample_encoded = [le.transform([val])[0] for le, val in zip(encoders, sample)]
+
+# Make prediction
+prediction = model.predict([sample_encoded])
+print("Prediction for new sample [EnjoySport]:", prediction[0])
+
+
+
+4-----------------------------------------------
+import numpy as np
+
+X = np.array(([2, 9], [1, 5], [3, 6]), dtype=float)
+y = np.array(([92], [86], [89]), dtype=float)
+X = X/np.amax(X,axis=0) #maximum of X array longitudinally
+y = y/100
+
+#Sigmoid Function
+def sigmoid (x):
+    return 1/(1 + np.exp(-x))
+
+#Derivative of Sigmoid Function
+def derivatives_sigmoid(x):
+    return x * (1 - x)
+
+#Variable initialization
+epoch=5 #Setting training iterations
+lr=0.1 #Setting learning rate
+
+inputlayer_neurons = 2 #number of features in data set
+hiddenlayer_neurons = 3 #number of hidden layers neurons
+output_neurons = 1 #number of neurons at output layer
+#weight and bias initialization
+
+wh=np.random.uniform(size=(inputlayer_neurons,hiddenlayer_neurons))
+bh=np.random.uniform(size=(1,hiddenlayer_neurons))
+wout=np.random.uniform(size=(hiddenlayer_neurons,output_neurons))
+bout=np.random.uniform(size=(1,output_neurons))
+
+#draws a random range of numbers uniformly of dim x*y
+for i in range(epoch):
+    #Forward Propogation
+    hinp1=np.dot(X,wh)
+    hinp=hinp1 + bh
+    hlayer_act = sigmoid(hinp)
+    outinp1=np.dot(hlayer_act,wout)
+    outinp= outinp1+bout
+    output = sigmoid(outinp)
+    
+    #Backpropagation
+    EO = y-output
+    outgrad = derivatives_sigmoid(output)
+    d_output = EO * outgrad
+    EH = d_output.dot(wout.T)
+    hiddengrad = derivatives_sigmoid(hlayer_act)#how much hidden layer wts contributed to error
+    d_hiddenlayer = EH * hiddengrad
+    
+    wout += hlayer_act.T.dot(d_output) *lr   # dotproduct of nextlayererror and currentlayerop
+    wh += X.T.dot(d_hiddenlayer) *lr
+    
+    print ("-----------Epoch-", i+1, "Starts----------")
+    print("Input: \n" + str(X)) 
+    print("Actual Output: \n" + str(y))
+    print("Predicted Output: \n" ,output)
+    print ("-----------Epoch-", i+1, "Ends----------\n")
+        
+print("Input: \n" + str(X)) 
+print("Actual Output: \n" + str(y))
+print("Predicted Output: \n" ,output)
+
+
+5---------------------------------------------------
+import numpy as np
+from collections import Counter
+
+X = np.array([[1,2],[2,3],[3,1],[6,5],[7,7],[8,6]])
+y = np.array(['A','A','A','B','B','B'])
+
+def knn(x_test, k=3):
+    dists = [np.linalg.norm(x - x_test) for x in X]
+    k_labels = y[np.argsort(dists)[:k]]
+    return Counter(k_labels).most_common(1)[0][0]
+
+test = np.array([5,5])
+print(f"Predicted class for {test}: '{knn(test)}'")
+
+
+6---------------------------------------------------------
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+# Load dataset
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Split into training and testing sets (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+# Create and train Naïve Bayes model
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+# Predict on test set
+y_pred = model.predict(X_test)
+
+# Display results
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Accuracy: {:.2f}%".format(accuracy_score(y_test, y_pred) * 100))
+
+
+
+7----------------------------------------------------------------------
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Load dataset (binary classification: class 0 vs class 1)
+iris = load_iris()
+X = iris.data[:100]  # Only first 2 classes (0 and 1)
+y = iris.target[:100]
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+# Create and train the model
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Output results
+print("Predictions:", y_pred)
+print("Accuracy: {:.2f}%".format(accuracy_score(y_test, y_pred) * 100))
+
+
+
+8------------------------------------------------------
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+# Sample dataset (e.g., Hours Studied vs Exam Score)
+X = np.array([[1], [2], [3], [4], [5]])  # Hours
+y = np.array([40, 50, 60, 65, 80])       # Scores
+
+# Train the model
+model = LinearRegression()
+model.fit(X, y)
+
+# Predict
+y_pred = model.predict(X)
+
+# Display results
+print("Predicted values:", y_pred)
+print("Mean Squared Error:", mean_squared_error(y, y_pred))
+
+# Plotting
+plt.scatter(X, y, color='blue', label='Actual')
+plt.plot(X, y_pred, color='red', label='Predicted Line')
+plt.xlabel('Hours Studied')
+plt.ylabel('Exam Score')
+plt.title('Linear Regression Example')
+plt.legend()
+plt.show()
+
+
+
+9-------------------------------------------------------------
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+
+# Sample data
+X = np.array([[1],[2],[3],[4],[5],[6],[7],[8],[9]])
+y = np.array([3,6,8,14,25,36,45,65,80])
+
+# Linear Regression
+lin = LinearRegression().fit(X, y)
+y_lin = lin.predict(X)
+
+# Polynomial Regression (degree 2)
+X_poly = PolynomialFeatures(degree=2).fit_transform(X)
+poly = LinearRegression().fit(X_poly, y)
+y_poly = poly.predict(X_poly)
+
+# Plot
+plt.scatter(X, y, color='blue')
+plt.plot(X, y_lin, color='red', label='Linear')
+plt.plot(X, y_poly, color='green', label='Polynomial')
+plt.legend()
+plt.title('Linear vs Polynomial Regression')
+plt.show()
+
+
+
+10----------------------------------------------------------------
+import numpy as np
+
+X = np.array([1, 2, 3, 5, 6, 8, 10, 11, 20, 22, 25, 27]).reshape(-1, 1)
+
+mu1, mu2, sigma1, sigma2, pi1, pi2 = 5, 20, 2, 2, 0.5, 0.5
+
+for _ in range(10):
+    p1 = pi1 * np.exp(-(X - mu1)**2 / (2 * sigma1**2)) / (np.sqrt(2*np.pi) * sigma1)
+    p2 = pi2 * np.exp(-(X - mu2)**2 / (2 * sigma2**2)) / (np.sqrt(2*np.pi) * sigma2)
+    gamma1 = p1 / (p1 + p2)
+    gamma2 = 1 - gamma1
+
+    N1, N2 = np.sum(gamma1), np.sum(gamma2)
+    mu1 = np.sum(gamma1 * X.ravel()) / N1
+    mu2 = np.sum(gamma2 * X.ravel()) / N2
+    sigma1 = np.sqrt(np.sum(gamma1 * (X.ravel() - mu1)**2) / N1)
+    sigma2 = np.sqrt(np.sum(gamma2 * (X.ravel() - mu2)**2) / N2)
+    pi1, pi2 = N1/len(X), N2/len(X)
+
+print("Final Means:", round(mu1,2), round(mu2,2))
+print("Cluster Assignments:", (gamma1 < gamma2).astype(int))
+
+
+
+11---------------------------------------------------------
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Sample dataset: [Income, Loans, Delays, Credit Mix] -> Credit Score
+X = np.array([
+    [50000, 2, 1, 1],
+    [80000, 1, 0, 3],
+    [30000, 4, 3, 0],
+    [75000, 2, 0, 3],
+    [25000, 5, 4, 0],
+    [60000, 1, 0, 1],
+    [40000, 3, 2, 1],
+    [90000, 1, 0, 3]
+])
+y = np.array(["Fair", "Good", "Poor", "Good", "Poor", "Fair", "Fair", "Good"])
+
+# Train/test split
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.25, random_state=1)
+
+# Train model
+model = RandomForestClassifier()
+model.fit(xtrain, ytrain)
+
+# Evaluate
+ypred = model.predict(xtest)
+print("Accuracy: {:.2f}%".format(accuracy_score(ytest, ypred) * 100))
+
+# Predict new sample
+sample = np.array([[70000, 1, 0, 3]])  # [Income, Loans, Delays, Mix]
+print("Predicted Credit Score:", model.predict(sample)[0])
+
+
+
+12-----------------------------------------------------------------
+
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load dataset
+iris = load_iris()
+X = iris.data      # Feature matrix
+y = iris.target    # Target labels
+
+# Split into training and testing
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# KNN model (k=3)
+model = KNeighborsClassifier(n_neighbors=3)
+model.fit(xtrain, ytrain)
+
+# Evaluate
+ypred = model.predict(xtest)
+print("Accuracy: {:.2f}%".format(accuracy_score(ytest, ypred) * 100))
+print("\nClassification Report:\n", classification_report(ytest, ypred, target_names=iris.target_names))
+
+# Predict a new flower
+sample = [[5.1, 3.5, 1.4, 0.2]]  # Example input
+prediction = model.predict(sample)
+print("\nPredicted Iris Species:", iris.target_names[prediction[0]])
+
+
+
+13----------------------------------------------------------------
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+# Sample dataset
+data = {
+    'Year': [2010, 2012, 2014, 2016, 2018, 2020, 2021],
+    'Mileage': [70000, 60000, 50000, 40000, 30000, 15000, 10000],
+    'Engine': [1200, 1400, 1500, 1600, 1500, 1500, 1200],
+    'Price': [2.5, 3.0, 3.6, 4.2, 5.0, 6.5, 7.0]  # in lakhs
+}
+df = pd.DataFrame(data)
+
+# Features (X) and target (y)
+X = df[['Year', 'Mileage', 'Engine']]
+y = df['Price']
+
+# Train-test split
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=1)
+
+# Train the model
+model = LinearRegression()
+model.fit(xtrain, ytrain)
+
+# Predict price of a new car
+new_car = pd.DataFrame([[2022, 8000, 1500]], columns=['Year', 'Mileage', 'Engine'])
+predicted_price = model.predict(new_car)
+
+# Output
+print("Predicted Car Price (in lakhs): ₹", round(predicted_price[0], 2))
+
+
+
+14----------------------------------------------------------------------
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+# Sample dataset: [Size in sq.ft, Bedrooms, Age of House], Price in lakhs
+data = {
+    'Size': [1500, 1600, 1700, 1800, 1900, 2100, 2300],
+    'Bedrooms': [3, 3, 3, 4, 4, 4, 5],
+    'Age': [10, 8, 5, 7, 3, 2, 1],
+    'Price': [50, 55, 60, 65, 70, 75, 85]
+}
+df = pd.DataFrame(data)
+
+# Features and Target
+X = df[['Size', 'Bedrooms', 'Age']]
+y = df['Price']
+
+# Train/test split
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=0)
+
+# Train the model
+model = LinearRegression()
+model.fit(xtrain, ytrain)
+
+# Predict price for a new house
+new_house = pd.DataFrame([[2000, 4, 3]], columns=['Size', 'Bedrooms', 'Age'])
+predicted_price = model.predict(new_house)
+
+# Output
+print("Predicted House Price (in lakhs): ₹", round(predicted_price[0], 2))
+
+
+
+15---------------------------------------------------------------------------
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data  # features
+y = iris.target  # labels (0 = setosa, 1 = versicolor, 2 = virginica)
+
+# Split into training and testing data
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Create and train the Naive Bayes model
+model = GaussianNB()
+model.fit(xtrain, ytrain)
+
+# Predict on test data
+ypred = model.predict(xtest)
+
+# Evaluate the model
+print("Accuracy: {:.2f}%".format(accuracy_score(ytest, ypred) * 100))
+print("\nClassification Report:\n", classification_report(ytest, ypred, target_names=iris.target_names))
+
+# Predict a new sample
+sample = [[5.9, 3.0, 5.1, 1.8]]  # Example input
+prediction = model.predict(sample)
+print("\nPredicted Iris Species:", iris.target_names[prediction[0]])
+
+
+
+16----------------------------------------------------------------------------
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+
+# Load dataset
+iris = load_iris()
+X, y = iris.data, iris.target
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# List of classifiers
+models = {
+    "Logistic Regression": LogisticRegression(),
+    "K-Nearest Neighbors": KNeighborsClassifier(),
+    "Naive Bayes": GaussianNB(),
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier(),
+    "SVM": SVC()
+}
+
+# Evaluate each model
+for name, model in models.items():
+    model.fit(xtrain, ytrain)
+    ypred = model.predict(xtest)
+    acc = accuracy_score(ytest, ypred)
+    print(f"\n=== {name} ===")
+    print(f"Accuracy: {acc*100:.2f}%")
+    print(classification_report(ytest, ypred, target_names=iris.target_names))
+
+
+
+17----------------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score
+
+# Sample dataset: [Battery(mAh), RAM(GB), Memory(GB), Display(inch), Price]
+data = {
+    'Battery': [3000, 4000, 3500, 4500, 5000, 3200, 4100],
+    'RAM': [4, 6, 4, 8, 8, 3, 6],
+    'Memory': [64, 128, 64, 256, 128, 32, 128],
+    'Display': [6.0, 6.5, 6.2, 6.7, 6.4, 5.8, 6.6],
+    'Price': [12, 18, 14, 25, 22, 10, 19]  # Price in ₹k
+}
+df = pd.DataFrame(data)
+
+# Features and target
+X = df[['Battery', 'RAM', 'Memory', 'Display']]
+y = df['Price']
+
+# Split dataset
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=1)
+
+# Model
+model = RandomForestRegressor(n_estimators=100, random_state=1)
+model.fit(xtrain, ytrain)
+
+# Predict on test set
+ypred = model.predict(xtest)
+print("R² Score:", round(r2_score(ytest, ypred), 2))
+
+# Predict a new mobile
+new_phone = pd.DataFrame([[4500, 8, 128, 6.6]], columns=['Battery', 'RAM', 'Memory', 'Display'])
+price_pred = model.predict(new_phone)
+print("Predicted Mobile Price: ₹", round(price_pred[0], 2), "K")
+
+
+
+18--------------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score
+
+# Sample dataset: [Battery(mAh), RAM(GB), Memory(GB), Display(inch), Price]
+data = {
+    'Battery': [3000, 4000, 3500, 4500, 5000, 3200, 4100],
+    'RAM': [4, 6, 4, 8, 8, 3, 6],
+    'Memory': [64, 128, 64, 256, 128, 32, 128],
+    'Display': [6.0, 6.5, 6.2, 6.7, 6.4, 5.8, 6.6],
+    'Price': [12, 18, 14, 25, 22, 10, 19]  # Price in ₹k
+}
+df = pd.DataFrame(data)
+
+# Features and target
+X = df[['Battery', 'RAM', 'Memory', 'Display']]
+y = df['Price']
+
+# Split dataset
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=1)
+
+# Model
+model = RandomForestRegressor(n_estimators=100, random_state=1)
+model.fit(xtrain, ytrain)
+
+# Predict on test set
+ypred = model.predict(xtest)
+print("R² Score:", round(r2_score(ytest, ypred), 2))
+
+# Predict a new mobile
+new_phone = pd.DataFrame([[4500, 8, 128, 6.6]], columns=['Battery', 'RAM', 'Memory', 'Display'])
+price_pred = model.predict(new_phone)
+print("Predicted Mobile Price: ₹", round(price_pred[0], 2), "K")
+
+
+
+19--------------------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+
+# Sample dataset
+data = {
+    'Credit_Score': [650, 700, 620, 710, 680, 590, 720, 610, 690, 730],
+    'Income': [50000, 60000, 45000, 65000, 58000, 40000, 70000, 42000, 61000, 72000],
+    'Loan_Amount': [200000, 250000, 150000, 300000, 220000, 140000, 320000, 130000, 240000, 310000],
+    'Approved': [1, 1, 0, 1, 1, 0, 1, 0, 1, 1]
+}
+df = pd.DataFrame(data)
+
+# Features and target
+X = df[['Credit_Score', 'Income', 'Loan_Amount']]
+y = df['Approved']
+
+# Train model
+xtrain, xtest, ytrain, ytest = train_test_split(X, y, test_size=0.3, random_state=42)
+model = GaussianNB()
+model.fit(xtrain, ytrain)
+
+# Test multiple inputs
+test_inputs = [
+    [610, 42000, 130000],  # Known not approved case
+    [580, 35000, 150000],  # Likely not approved
+    [720, 70000, 320000],
+    [600, 40000, 200000]   # Known approved case
+]
+
+print("Loan Approval Predictions:")
+for inp in test_inputs:
+    df_inp = pd.DataFrame([inp], columns=['Credit_Score', 'Income', 'Loan_Amount'])
+    pred = model.predict(df_inp)[0]
+    print(f"Input: {inp} => Prediction: {'Approved' if pred == 1 else 'Not Approved'}")
+
+
+20-----------------------------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
+# Sample sales data (Month number vs Sales in units)
+data = {
+    'Month': np.arange(1, 13),  # Months 1 to 12
+    'Sales': [200, 220, 250, 270, 300, 320, 340, 360, 390, 420, 450, 480]
+}
+df = pd.DataFrame(data)
+
+# Features and target
+X = df[['Month']]
+y = df['Sales']
+
+# Train Linear Regression model
+model = LinearRegression()
+model.fit(X, y)
+
+# Predict sales for next 3 months (months 13,14,15)
+future_months = pd.DataFrame({'Month': [13, 14, 15]})
+future_sales_pred = model.predict(future_months)
+
+# Output predictions
+for month, sales in zip(future_months['Month'], future_sales_pred):
+    print(f"Predicted sales for month {month}: {sales:.2f} units")
